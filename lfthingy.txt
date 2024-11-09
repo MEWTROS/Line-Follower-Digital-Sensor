@@ -1,0 +1,139 @@
+// Left Sensors Value Initialization
+int s1 = 1; //DO ---> Pin 2
+int s2 = 1;
+int s3 = 1;
+// Middle Sensors Value Initialization
+int s4 = 1; // D3 ---> Pin 5
+int s5 = 1;
+// Right Sensors Value Initialization
+int s6 = 1;
+int s7 = 1;
+int s8 = 1; // D7 ---> Pin 9
+// 9th Single Sensor (For Stopping) Value Initialization
+int s9 = 0;
+
+#define led 13 // LED pin
+
+// Motor Speed (PWM)
+int spd = 90;
+
+// Motor Pin Declaration
+// Left Motor
+const int lmf = A5;
+const int lmb = A4;
+
+// Right Motor
+const int rmb = A2;
+const int rmf = A1;
+
+// Speed Controller PWM Pins for Both Motors
+#define lpwm 11
+#define rpwm 10
+
+// Function declarations (prototypes)
+void forward();
+void right();
+void left();
+void Stop();
+
+void setup() {
+    // Pin 2,3,4,5,6,7,8,9 are for Sensor Array (D0, D1, D2, D3, D4, D5, D6, D7, D8), Set as INPUT
+    for (int i = 2; i <= 9; i++) {
+        pinMode(i, INPUT);
+    }
+
+    // Motor Pin Set for OUTPUT
+    pinMode(A5, OUTPUT);
+    pinMode(A4, OUTPUT);
+    pinMode(A2, OUTPUT);
+    pinMode(A1, OUTPUT);
+
+    // PWM Pins as OUTPUT
+    pinMode(lpwm, OUTPUT);
+    pinMode(rpwm, OUTPUT);
+}
+
+void loop() {
+    // Reading Sensor Array Values
+    s1 = digitalRead(2);
+    s2 = digitalRead(3);
+    s3 = digitalRead(4);
+    s4 = digitalRead(5);
+    s5 = digitalRead(6);
+    s6 = digitalRead(7);
+    s7 = digitalRead(8);
+    s8 = digitalRead(9); 
+
+    // Reading Extra 9th Sensor Value
+    s9 = digitalRead(12);
+
+    // Forward
+    if (s4 == 1 || s5 == 1) {
+        forward();
+        digitalWrite(led, LOW);
+    }
+
+    // Right
+    if (s6 == 1 || s7 == 1 || s8 == 1) {
+        right();
+        digitalWrite(led, LOW);
+    }
+
+    // Left
+    if (s1 == 1 || s2 == 1 || s3 == 1) {
+        left();
+        digitalWrite(led, LOW);
+    }
+
+    // Special condition for stopping (or sharp turns)
+    if ((s1 == 1 && s4 == 1 && s8 == 1) || (s1 == 1 && s5 == 1 && s8 == 1) || (s1 == 1 && s5 == 1 && s4 == 1 && s8 == 1)) {
+        analogWrite(led, 255);
+        delay(1);
+    }
+
+
+    // Stop the robot if all sensors detect the line (all sensors are 0)
+    if (s1 == 1 && s2 == 1 && s3 == 1 && s4 == 1 && s5 == 1 && s6 == 1 && s7 == 1 && s8 == 1) {
+        Stop();
+    }
+}
+
+void forward() {
+    analogWrite(lpwm, spd);
+    analogWrite(rpwm, spd);
+    digitalWrite(rmf, HIGH);
+    digitalWrite(rmb, LOW);
+    digitalWrite(lmf, HIGH);
+    digitalWrite(lmb, LOW);
+    delay(10);
+}
+
+void left() {
+    analogWrite(lpwm, spd);
+    analogWrite(rpwm, spd);
+    digitalWrite(rmf, LOW);
+    digitalWrite(rmb, HIGH);
+    digitalWrite(lmf, HIGH);
+    digitalWrite(lmb, LOW);
+    delay(10);
+}
+
+void right() {
+    analogWrite(lpwm, spd);
+    analogWrite(rpwm, spd);
+    digitalWrite(rmf, HIGH);
+    digitalWrite(rmb, LOW);
+    digitalWrite(lmf, LOW);
+    digitalWrite(lmb, HIGH);
+    delay(10);
+}
+
+void Stop() {
+    analogWrite(lpwm, spd);
+    analogWrite(rpwm, spd);
+    digitalWrite(rmf, LOW);
+    digitalWrite(rmb, LOW);
+    digitalWrite(lmf, LOW);
+    digitalWrite(lmb, LOW);
+    digitalWrite(led, HIGH); // Turn on LED when stopping
+}

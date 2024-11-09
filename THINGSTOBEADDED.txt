@@ -1,0 +1,12 @@
+MAIN MENU
+pause menu
+ADD BOT
+MAKE PHONE PLAYABLE
+
+
+
+FUNCTIONAL
+floor
+fake windows
+fake doors
+basic architecture
